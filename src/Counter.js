@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import store from './store'
+import store, {INCREMENT, DECREMENT, UNDO, REDO} from './store'
 
 class Counter extends Component {
   constructor(props) {
@@ -8,8 +8,33 @@ class Counter extends Component {
       store: store.getState()
     };
   }
+
+  componentDidMount = () => {
+    store.subscribe(() => {
+      this.setState({
+        store: store.getState()
+      })
+    })
+  }
+
+  increment = amount => {
+    store.dispatch({ type: INCREMENT, amount: amount })
+  }
+
+  decrement = amount => {
+    store.dispatch({ type: DECREMENT, amount: amount })
+  }
+
+  undo = amount => {
+    store.dispatch({ type: UNDO })
+  }
+
+  redo = amount => {
+    store.dispatch({ type: REDO })
+  }
+
   render() {
-    const { currentValue } = this.state.store
+    const { currentValue, futureValues, previousValues } = this.state.store
     return (
       <div className="app">
         <section className="counter">
@@ -17,40 +42,40 @@ class Counter extends Component {
           <div className="counter__button-wrapper">
             <button
               className="counter__button increment-one"
-              onClick={() => null}
+              onClick={() => this.increment(1)}
             >
               +1
             </button>
             <button
               className="counter__button increment-five"
-              onClick={() => null}
+              onClick={() => this.increment(5)}
             >
               +5
             </button>
             <button
               className="counter__button decrement-one"
-              onClick={() => null}
+              onClick={() => this.decrement(1)}
             >
               -1
             </button>
             <button
               className="counter__button decrement-five"
-              onClick={() => null}
+              onClick={() => this.decrement(5)}
             >
               -5
             </button>
             <br />
             <button
               className="counter__button undo"
-              disabled={true}
-              onClick={() => null}
+              disabled={previousValues.length === 0}
+              onClick={() => this.undo()}
             >
               Undo
             </button>
             <button
               className="counter__button redo"
-              disabled={true}
-              onClick={() => null}
+              disabled={futureValues.length === 0}
+              onClick={() => this.redo()}
             >
               Redo
             </button>
